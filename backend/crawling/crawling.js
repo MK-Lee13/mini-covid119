@@ -16,7 +16,7 @@ const crawling_all = () => {
                 if (!error && response.statusCode == 200) {
                     const $ = cheerio.load(body);
                     let region_src, new_infected_src;
-                    for (let index=2; index<=19; index++){
+                    for (let index = 2; index <= 19; index++){
                         const region = $(`#content > div > div.data_table.midd.mgt24 > table > tbody > tr:nth-child(${index}) > th`); // 지역
                         const new_infected = $(`#content > div > div.data_table.midd.mgt24 > table > tbody > tr:nth-child(${index}) > td:nth-child(2)`); // 전날 비교 증가한 감염자
                         
