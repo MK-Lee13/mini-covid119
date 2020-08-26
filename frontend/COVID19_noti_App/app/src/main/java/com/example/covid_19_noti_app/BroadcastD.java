@@ -38,7 +38,6 @@ public class BroadcastD extends BroadcastReceiver {
                 .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE).setContentIntent(pendingIntent).setAutoCancel(true);
 
         notificationmanager.notify(1, builder.build());
-        Log.i("TAG", "지니가버린");
     }
 
     //다음날 아침 11시에 알림주기
