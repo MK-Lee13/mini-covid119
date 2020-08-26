@@ -2,13 +2,23 @@ const request = require('request');
 const cheerio = require('cheerio');
 const baseUrl = 'http://ncov.mohw.go.kr/bdBoardList_Real.do?brdId=1&brdGubun=13&ncvContSeq=&contSeq=&board_id=&gubun=' 
 
+const mysql      = require('mysql');
+const connection = mysql.createConnection({
+  host     : 'localhost',
+  user     : 'root',
+  password : 'kimecr5p9253!!',
+  database : 'project_covid119'
+});
+
+connection.connect();
+
 const options = {
     url: baseUrl,
     headers: {
         'User-Agent': 'request'
     }
 };
-
+var count=0;
 const crawling_all = () => {
     return new Promise((resolve, reject) => {
         let region_infected = []
@@ -29,8 +39,18 @@ const crawling_all = () => {
                         });
                         
                         region_infected.push({region : region_src, new_infected : new_infected_src});  
+                        count++;
                     }
                     resolve(region_infected)
+                    
+                    //db에 data 저장
+                    for(var i=0;i<count;i++){
+                        var sql='insert into infect_korea (region,infect_num) values (?,?)';
+                        connection.query(sql,[region_infected[i].region,region_infected[i].new_infected],function(err,result) {
+                            if(err) console.log(err);
+                        });
+                    }
+                    
                 } else {
                     reject('err')
                 }
@@ -38,6 +58,9 @@ const crawling_all = () => {
         )
     })
 }
+
+
+
 
 module.exports = crawling_all;
 
