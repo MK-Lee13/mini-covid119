@@ -16,7 +16,17 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
+
+import org.json.JSONObject;
+
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import okhttp3.Interceptor;
@@ -27,7 +37,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity  {
     AlarmManager alarm_manager;
     PendingIntent pendingIntent;
     @Override
@@ -83,32 +93,89 @@ public class MainActivity extends AppCompatActivity {
                 sendBroadcast(my_intent);
             }
         });
+        /*
+        //Retrofit 코드
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://localhost:3000/")
+                .baseUrl("https://10.0.2.2:3000/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         RetrofitService service = retrofit.create(RetrofitService.class);
 
         Call<PostResult> call = service.getPosts("1");
-        call.enqueue(new Callback<PostResult>() {
+
+        PostResult jsonObject= new PostResult();
+        try {
+            jsonObject=call.execute().body();
+            Log.d("Tag : ", "onResponse: 성공, 결과\n" + jsonObject.toString());
+        }catch (JsonSyntaxException | IOException e){
+
+            System.out.println("plan list is null");
+        }*/
+        new Thread(new Runnable() {
             @Override
-            public void onResponse(Call<PostResult> call, Response<PostResult> response) {
-                if (response.isSuccessful()){
-                    //정상적인 통신
-                    PostResult result = response.body();
-                    Log.d("Tag : ", "onResponse: 성공, 결과\n" + result.toString());
-                }else{
-                    Log.d("Tag : ", "onResponse: 실패");
+            public void run() {
+                try {
+                    createPost();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
+    }
+    private void createPost() throws IOException {
+        String region = null;
+        String infect = null;
+        Gson gson = new GsonBuilder()
+                .setLenient()
+                .create();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://172.30.1.72:3000/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        RetrofitService retrofitService=retrofit.create(RetrofitService.class);
+        Call<JsonArray> call = retrofitService.getretrofitquery(region,infect);
+        call.enqueue(new Callback<JsonArray>() {
+            @Override
+            public void onResponse(Call<JsonArray> call, Response<JsonArray> response) {
+                if (response.isSuccessful()) {
+                    //Log.d("check : ","response.raw :"+response.body());
+                    //Log.d("check : ","response.raw :"+postResult.getregion().get(0).getRegion());
+                    //Log.d("check : ","response.raw :"+response.body());
+                    ArrayList<String> arrayList=new ArrayList<>();
+                    JsonArray jsonArray=response.body();
+                    for(int i=0;i<jsonArray.size();i++) {
+                        JsonElement jsonElement1 = jsonArray.get(i);
+                        String Name1 = jsonElement1.getAsJsonObject().get("region").getAsString();
+                        String Name2 = jsonElement1.getAsJsonObject().get("new_infected").getAsString();
+                        Log.d("check : ","지역 :"+Name1 + "코로나 증가자 : " +Name2);
+                    }
+
+
                 }
             }
 
             @Override
-            public void onFailure(Call<PostResult> call, Throwable t) {
-                Log.d("Tag : ","onFailure: " + t.getMessage());
+            public void onFailure(Call<JsonArray> call, Throwable t) {
             }
         });
+       //System.out.println(retrofitConnection.string);
+
+/*
+        Call call = new Retrofit.Builder()
+                .baseUrl("https://10.0.2.2:3000/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+                .create(RetrofitService.class)
+                .getPosts();
+        try {
+            //post=call.execute().body();
+            String str= (String) call.execute().body();
+            System.out.println(str);
+        }catch(JsonSyntaxException e){
+            System.out.println("error");
+        }
+*/
     }
-
-
 }
