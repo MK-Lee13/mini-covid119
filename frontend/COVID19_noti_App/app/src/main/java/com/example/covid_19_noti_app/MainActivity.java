@@ -14,6 +14,7 @@ import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -93,25 +94,7 @@ public class MainActivity extends AppCompatActivity  {
                 sendBroadcast(my_intent);
             }
         });
-        /*
-        //Retrofit 코드
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://10.0.2.2:3000/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
 
-        RetrofitService service = retrofit.create(RetrofitService.class);
-
-        Call<PostResult> call = service.getPosts("1");
-
-        PostResult jsonObject= new PostResult();
-        try {
-            jsonObject=call.execute().body();
-            Log.d("Tag : ", "onResponse: 성공, 결과\n" + jsonObject.toString());
-        }catch (JsonSyntaxException | IOException e){
-
-            System.out.println("plan list is null");
-        }*/
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -127,6 +110,8 @@ public class MainActivity extends AppCompatActivity  {
     private void createPost() throws IOException {
         String region = null;
         String infect = null;
+        final ArrayList<String> region_arr=new ArrayList<>();
+        ArrayList<String> infect_arr=new ArrayList<>();
         Gson gson = new GsonBuilder()
                 .setLenient()
                 .create();
@@ -143,15 +128,21 @@ public class MainActivity extends AppCompatActivity  {
                     //Log.d("check : ","response.raw :"+response.body());
                     //Log.d("check : ","response.raw :"+postResult.getregion().get(0).getRegion());
                     //Log.d("check : ","response.raw :"+response.body());
-                    ArrayList<String> arrayList=new ArrayList<>();
+                    String Name1="";
+                    String Name2="";
+                    String total_text="";
                     JsonArray jsonArray=response.body();
                     for(int i=0;i<jsonArray.size();i++) {
                         JsonElement jsonElement1 = jsonArray.get(i);
-                        String Name1 = jsonElement1.getAsJsonObject().get("region").getAsString();
-                        String Name2 = jsonElement1.getAsJsonObject().get("new_infected").getAsString();
+                        region_arr.add(jsonElement1.getAsJsonObject().get("region").getAsString());
+                        Name1 = jsonElement1.getAsJsonObject().get("region").getAsString();
+                        Name2 = jsonElement1.getAsJsonObject().get("new_infected").getAsString();
+                        total_text = total_text + "\n" + Name1 + " : " +Name2;
                         Log.d("check : ","지역 :"+Name1 + "코로나 증가자 : " +Name2);
                     }
-
+                    TextView textView=findViewById(R.id.textView);
+                    textView.setText(total_text);
+                    Log.d("check_total : ",total_text);
 
                 }
             }
@@ -160,22 +151,6 @@ public class MainActivity extends AppCompatActivity  {
             public void onFailure(Call<JsonArray> call, Throwable t) {
             }
         });
-       //System.out.println(retrofitConnection.string);
 
-/*
-        Call call = new Retrofit.Builder()
-                .baseUrl("https://10.0.2.2:3000/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-                .create(RetrofitService.class)
-                .getPosts();
-        try {
-            //post=call.execute().body();
-            String str= (String) call.execute().body();
-            System.out.println(str);
-        }catch(JsonSyntaxException e){
-            System.out.println("error");
-        }
-*/
     }
 }
