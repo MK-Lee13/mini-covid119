@@ -4,4 +4,5 @@ const controller = require('./covid119.controller')
 
 router.get('/get', controller.get)
 
+
 module.exports = router

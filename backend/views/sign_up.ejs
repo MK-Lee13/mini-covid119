@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+<body>
+<h3>회원 가입</h3>
+<form action="../sign_up/create" method="post"> 
+    <!--action: body의 내용을 보낼때(type은 반드시 submit) 작동 / url로 데이터를 가지고 간다-->
+    <table>
+        <tr>
+            <td>이름 : </td>
+            <td><input type="text" name="userName"></td>
+        </tr>
+        <tr>
+            <td>이메일 : </td>
+            <td><input type="text" name="userEmail"></td>
+        </tr>
+        <tr>
+            <td>비번 : </td>
+            <td><input type="password" name="password"></td>
+        </tr>
+        <tr>
+            <td><input type="submit" value="회원가입"></td>
+        </tr>
+    </table>
+</form>
+</body>
+</html>

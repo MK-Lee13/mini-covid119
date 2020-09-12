@@ -22,7 +22,7 @@ const options = {
     }
 };
 var count=0;
-const crawling_all = () => {
+const crawling_all = () => {  // const crawling_all = function(){ return new promise ~ } 
     return new Promise((resolve, reject) => {
         let region_infected = []
         request(options, ((error, response, body) => {

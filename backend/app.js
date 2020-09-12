@@ -4,6 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+const models = require("./models/index.js");
 var indexRouter = require('./routes/index');
 
 var app = express();
@@ -19,6 +20,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
+app.set('view engine', 'ejs'); // views의 ejs파일을 읽어오기 위해
+
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -42,6 +45,14 @@ app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render('error');
+});
+
+// 추가
+models.sequelize.sync().then( () => {
+  console.log(" DB 연결 성공");
+}).catch(err => {
+  console.log("연결 실패");
+  console.log(err);
 });
 
 module.exports = app;
